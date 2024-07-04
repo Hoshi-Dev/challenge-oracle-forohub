@@ -1,14 +1,17 @@
-package com.alura.forohub.model.topic;
+package com.alura.forohub.domain.topic;
 
-import com.alura.forohub.model.Category;
-import com.alura.forohub.model.comment.Comment;
-import com.alura.forohub.model.user.User;
+import com.alura.forohub.domain.Category;
+import com.alura.forohub.domain.comment.Comment;
+import com.alura.forohub.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode(of = "id")
 public class Topic {
 
     @Id
@@ -23,6 +27,7 @@ public class Topic {
     private Long id;
 
     private String title;
+
     private String message;
 
     @Column(name = "created_at")
@@ -42,4 +47,14 @@ public class Topic {
 
     @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Comment> comments;
+
+    public Topic(NewTopicDTO data, User user) {
+        this.title = data.title();
+        this.message = data.message();
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.category = data.category();
+        this.user = user;
+        this.status = true;
+    }
 }

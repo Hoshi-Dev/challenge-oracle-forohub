@@ -1,10 +1,11 @@
-package com.alura.forohub.model.comment;
+package com.alura.forohub.domain.comment;
 
-import com.alura.forohub.model.topic.Topic;
-import com.alura.forohub.model.user.User;
+import com.alura.forohub.domain.topic.Topic;
+import com.alura.forohub.domain.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode(of = "id")
 public class Comment {
 
     @Id

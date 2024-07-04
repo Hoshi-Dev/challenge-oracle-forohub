@@ -1,4 +1,4 @@
-package com.alura.forohub.model;
+package com.alura.forohub.domain;
 
 public enum Role {
     ADMIN,
