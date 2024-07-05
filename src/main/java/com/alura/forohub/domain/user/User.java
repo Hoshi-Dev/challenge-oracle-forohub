@@ -4,10 +4,7 @@ import com.alura.forohub.domain.comment.Comment;
 import com.alura.forohub.domain.Role;
 import com.alura.forohub.domain.topic.Topic;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @EqualsAndHashCode(of = "id")
 public class User implements UserDetails {
 
@@ -96,5 +94,13 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return status;
+    }
+
+    public void setPassword(String password, BCryptPasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(password);
+    }
+
+    public void deactivateUser(Boolean status) {
+        this.status = status;
     }
 }
