@@ -1,7 +1,8 @@
 package com.alura.forohub.domain.topic;
 
-import com.alura.forohub.domain.user.IUserRepository;
-import com.alura.forohub.domain.user.User;
+
+import com.alura.forohub.domain.Category;
+import com.alura.forohub.domain.user.UserService;
 import com.alura.forohub.infra.errors.IntegrityValidation;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class TopicService {
@@ -18,15 +21,14 @@ public class TopicService {
     private ITopicRepository topicRepository;
 
     @Autowired
-    private IUserRepository userRepository;
+    private UserService userService;
 
     public ResponseTopicDTO createTopic(NewTopicDTO data) {
 
-        validateUserByName(data.user());
+        var user = userService.validateUserByName(data.user());
         validateTitleNotDuplicated(data.title());
         validateMessageNotDuplicated(data.message());
 
-        User user = (User) userRepository.findByName(data.user());
         var newTopic = new Topic(data, user);
         topicRepository.save(newTopic);
         return createResponse(newTopic);
@@ -41,6 +43,24 @@ public class TopicService {
         var searchedTopic = validateTopicById(id);
         return createResponse(searchedTopic);
     }
+
+    public Page<ResponseTopicDTO> getTopicByUser(Long id, Pageable paged) {
+        var user = userService.validateUserById(id);
+        Page<Topic> topics = topicRepository.findByUserId(user.getId(), paged);
+
+        return topics.map(this::createResponse);
+    }
+
+
+
+    public Page<Object> getTopicsByCategory(String category, Pageable paged) {
+        Category categoryEnum = Category.fromString(category);
+        validateTopicExistByCategory(categoryEnum);
+
+        Page<Topic> topicByCategory = topicRepository.findByCategory(categoryEnum, paged);
+        return topicByCategory.map(this::createResponse);
+    }
+
 
     public ResponseTopicDTO updateTopicById(Long id, UpdateTopicDTO data) {
         var updatedTopic = validateTopicById(id);
@@ -61,6 +81,7 @@ public class TopicService {
             updatedTopic.setStatus(data.status());
         }
         topicRepository.save(updatedTopic);
+
         return createResponse(updatedTopic);
     }
 
@@ -70,29 +91,30 @@ public class TopicService {
         return true;
     }
 
-    private void validateUserByName(String username){
-        if (!userRepository.existsByName(username)){
-            throw new IntegrityValidation("El usuario no se encuentra registrado.");
-        }
-    }
 
-    private void validateTitleNotDuplicated(String title){
+    private void validateTitleNotDuplicated(String title) {
         if (topicRepository.existsByTitleIgnoreCase(title)) {
             throw new IntegrityValidation("El título ya se encuentra registrado en la base de datos. " +
                     "Por favor, verifique el topic existente.");
         }
     }
 
-    private void validateMessageNotDuplicated(String message){
+    private void validateMessageNotDuplicated(String message) {
         if (topicRepository.existsByMessageIgnoreCase(message)) {
             throw new ValidationException("El contenido del topic ya se encuentra en la base de datos. " +
                     "Por favor, verifique el topic existente.");
         }
     }
 
-    private Topic validateTopicById(Long id){
+    public Topic validateTopicById(Long id) {
         return topicRepository.findById(id).orElseThrow(() ->
-                new ValidationException("No se encontró el Topic en los registros de la base de datos."));
+                new ValidationException("El Topic especificado no se encuentra en la base de datos."));
+    }
+
+    private void validateTopicExistByCategory(Category category) {
+        if (!topicRepository.existsByCategory(category)) {
+            throw new ValidationException("No se ha encontrado topics en esa categoría");
+        }
     }
 
     private ResponseTopicDTO createResponse(Topic topic) {

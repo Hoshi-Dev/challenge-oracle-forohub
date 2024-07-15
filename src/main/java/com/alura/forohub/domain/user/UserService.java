@@ -2,6 +2,8 @@ package com.alura.forohub.domain.user;
 
 import com.alura.forohub.infra.errors.IntegrityValidation;
 import jakarta.validation.ValidationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,27 +45,29 @@ public class UserService {
         var userUpdated = validateUserById(id);
         userUpdated.setUpdatedAt(LocalDateTime.now());
 
-        if (data.name() != null && !data.name().isEmpty()){
+        if (data.name() != null && !data.name().isEmpty()) {
             validateUserNameNotDuplicated(data.name());
             userUpdated.setName(data.name());
         }
-        if (data.email() != null && !data.email().isEmpty()){
+        if (data.email() != null && !data.email().isEmpty()) {
             validateUserEmailNotDuplicated(data.email());
             userUpdated.setEmail(data.email());
         }
-        if (data.password() != null && !data.password().isEmpty()){
+        if (data.password() != null && !data.password().isEmpty()) {
             userUpdated.setPassword(data.password(), passwordEncoder);
         }
-        if (data.role() != null && !data.role().toString().isEmpty()){
+        if (data.role() != null && !data.role().toString().isEmpty()) {
             userUpdated.setRole(data.role());
         }
-        if (data.status() != null && !data.status().toString().isEmpty()){
+        if (data.status() != null && !data.status().toString().isEmpty()) {
             userUpdated.deactivateUser(data.status());
         }
+
+        userRepository.save(userUpdated);
         return createResponse(userUpdated);
     }
 
-    public boolean deleteUserById(Long id) {
+    public Boolean deleteUserById(Long id) {
         var deletedUser = validateUserById(id);
         userRepository.delete(deletedUser);
         return true;
@@ -81,9 +85,17 @@ public class UserService {
         }
     }
 
-    private User validateUserById(Long id){
+    public User validateUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
                 new ValidationException("No se encontró el usuario en la base de datos"));
+    }
+
+    public User validateUserByName(String username) {
+        if (!userRepository.existsByName(username)) {
+            return (User) userRepository.findByName(username);
+        } else {
+            throw new IntegrityValidation("El usuario no se encuentra registrado.");
+        }
     }
 
     private ResponseUserDTO createResponse(User user) {
@@ -91,7 +103,8 @@ public class UserService {
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getCreatedAt()
+                user.getCreatedAt(),
+                user.getUpdatedAt()
         );
     }
 

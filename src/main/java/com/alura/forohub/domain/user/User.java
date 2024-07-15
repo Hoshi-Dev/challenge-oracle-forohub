@@ -55,9 +55,11 @@ public class User implements UserDetails {
         this.name = data.name();
         this.email = data.email();
         this.password = passwordEncoder.encode(data.password());
-        this.role = Role.valueOf(data.role());
+        this.role = Role.valueOf(data.role().toUpperCase());
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.topics = new ArrayList<>();
+        this.comments = new ArrayList<>();
         this.status = true;
     }
 

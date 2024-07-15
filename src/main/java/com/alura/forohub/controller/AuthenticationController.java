@@ -28,7 +28,7 @@ public class AuthenticationController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity authenticationUser(@RequestBody @Valid AuthenticationUserDTO data){
+    public ResponseEntity<?> authenticationUser(@RequestBody @Valid AuthenticationUserDTO data){
         Authentication authToken = new UsernamePasswordAuthenticationToken(data.name(), data.password());
         var authUser = authenticationManager.authenticate(authToken);
         var JWTToken = tokenService.generateToken((User) authUser.getPrincipal());

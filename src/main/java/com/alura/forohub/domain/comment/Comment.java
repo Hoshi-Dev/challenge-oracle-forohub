@@ -4,10 +4,7 @@ import com.alura.forohub.domain.topic.Topic;
 import com.alura.forohub.domain.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @EqualsAndHashCode(of = "id")
 public class Comment {
 
@@ -45,4 +43,16 @@ public class Comment {
 
     private Boolean status;
 
+    public Comment(NewCommentDTO data, Topic topic, User user) {
+        this.message = data.message();
+        this.topic = topic;
+        this.user = user;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.status = true;
+    }
+
+    public void deactivateComment(Boolean status){
+        this.status = status;
+    }
 }

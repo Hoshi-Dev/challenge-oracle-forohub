@@ -7,18 +7,18 @@ import jakarta.validation.constraints.Pattern;
 
 public record NewUserDTO(
 
-        @NotNull
+        @NotNull(message = "El nombre de usuario no puede estar vacío.")
         String name,
 
-        @NotNull
+        @NotNull(message = "No puede haber comentario vacío.")
         @Email
         String email,
 
-        @NotEmpty
+        @NotEmpty(message = "El password no puede estar vacío.")
         @Pattern(regexp = "[a-z0-9-]+")
         String password,
 
-        @NotNull
+        @NotNull(message = "El rol del usuario no puede estar vacío.")
         String role
 
 ) {

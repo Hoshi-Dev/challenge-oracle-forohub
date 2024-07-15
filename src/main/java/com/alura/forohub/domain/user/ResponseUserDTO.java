@@ -6,6 +6,7 @@ public record ResponseUserDTO(
         Long id,
         String name,
         String email,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
 ) {
 }
