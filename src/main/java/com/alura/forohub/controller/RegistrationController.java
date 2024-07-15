@@ -2,8 +2,8 @@ package com.alura.forohub.controller;
 
 import com.alura.forohub.domain.user.NewUserDTO;
 import com.alura.forohub.domain.user.ResponseUserDTO;
-import com.alura.forohub.domain.user.User;
 import com.alura.forohub.domain.user.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +28,7 @@ public class RegistrationController {
     private UserService userService;
 
     @PostMapping
+    @Operation(summary = "Registra un nuevo usuario.")
     public ResponseEntity<?> userRegistration(@RequestBody @Valid NewUserDTO data, UriComponentsBuilder uriComponentsBuilder){
         try{
             ResponseUserDTO user = userService.createNewUser(data);

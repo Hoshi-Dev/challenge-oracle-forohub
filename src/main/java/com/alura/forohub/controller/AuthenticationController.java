@@ -4,6 +4,7 @@ import com.alura.forohub.domain.user.AuthenticationUserDTO;
 import com.alura.forohub.domain.user.User;
 import com.alura.forohub.infra.security.JWTTokenDTO;
 import com.alura.forohub.infra.security.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class AuthenticationController {
 
     @PostMapping
     @Transactional
+    @Operation(summary = "Login de Usuario")
     public ResponseEntity<?> authenticationUser(@RequestBody @Valid AuthenticationUserDTO data){
         Authentication authToken = new UsernamePasswordAuthenticationToken(data.name(), data.password());
         var authUser = authenticationManager.authenticate(authToken);
